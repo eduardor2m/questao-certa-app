@@ -101,7 +101,7 @@
 
           &:hover {
             filter: brightness(0.9);
-            background: rgba($color: #0d6fde, $alpha: 0.1);
+            background: rgba(13, 111, 222, 0.1);
 
             .icon_body_left {
               color: var(--blue);
@@ -152,6 +152,7 @@
       .body_right {
         width: 20%;
         height: 100%;
+        padding: 0 20px;
 
         .body_right_informations {
           width: 100%;
