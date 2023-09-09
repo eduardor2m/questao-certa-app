@@ -127,6 +127,7 @@ export const CardFilter = ({ data }: CardFilterProps) => {
                 value="Gerar"
                 onClick={() => {
                   handleGenerateQuestions()
+                  data.handleShowModal()
                 }}
               >
                 Gerar Simulado
