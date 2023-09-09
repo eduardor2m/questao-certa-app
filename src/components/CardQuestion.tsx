@@ -24,7 +24,11 @@ export const CardQuestion = ({ data }: CardQuestionProps) => {
   function handleOptionIsIqualAnswer(option: string) {
     const check = option === data.answer
 
-    if (check) {
+    if (!check && correct !== '') {
+      setCorrect(correct)
+    } else if (!check && incorrect !== '') {
+      setIncorrect(incorrect)
+    } else if (check) {
       setCorrect(option)
     } else {
       setIncorrect(option)

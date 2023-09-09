@@ -10,18 +10,25 @@ import { CardQuestion } from '@/components/CardQuestion'
 import { CardFilter } from '@/components/CardFilter'
 import { useState } from 'react'
 import { useQuestion } from '@/hooks/useQuestion'
+import { CardAlert } from '@/components/cardAlert'
 
 export default function Home() {
   const [modal, setModal] = useState(false)
-  const [path, setPath] = useState('test')
+  const [alert, setAlert] = useState(false)
+  const [path, setPath] = useState('create')
   const { questions } = useQuestion()
 
   function handleShowModal() {
     setModal(!modal)
   }
+
+  function handleShowAlert() {
+    setAlert(!alert)
+  }
   return (
     <main className={styles.container}>
       {modal && <CardFilter data={{ handleShowModal }} />}
+      {alert && <CardAlert data={{ handleShowAlert }} />}
       <div className={styles.content}>
         <section className={styles.header}>
           <Image
@@ -81,7 +88,7 @@ export default function Home() {
                 backgroundColor: path === 'clean' ? '#0d6fde1a' : '',
                 color: path === 'clean' ? '#0d6fde' : '',
               }}
-              onClick={() => setPath('clean')}
+              onClick={() => setAlert(true)}
             >
               <AiOutlineClear
                 className={styles.icon_body_left}
@@ -105,7 +112,7 @@ export default function Home() {
                 backgroundColor: path === 'test' ? '#0d6fde1a' : '',
                 color: path === 'test' ? '#0d6fde' : '',
               }}
-              onClick={() => setPath('test')}
+              onClick={() => setAlert(true)}
             >
               <RiTestTubeLine
                 className={styles.icon_body_left}

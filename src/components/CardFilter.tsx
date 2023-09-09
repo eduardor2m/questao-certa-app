@@ -96,6 +96,7 @@ export const CardFilter = ({ data }: CardFilterProps) => {
                 <option value="cespe" selected>
                   CESPE
                 </option>
+                <option value="cesgranrio">CESGRANRIO</option>
                 <option value="fgv">FGV</option>
                 <option value="fmp">FMP</option>
                 <option value="fcc">FCC</option>
