@@ -20,11 +20,16 @@ type QuestionFilterProps = {
 
 export const CardFilter = ({ data }: CardFilterProps) => {
   const { generateQuestions } = useQuestion()
-  const [filter, setFilter] = useState<QuestionFilterProps>(
-    {} as QuestionFilterProps,
-  )
+  const [filter, setFilter] = useState<QuestionFilterProps>({
+    organization: 'cespe',
+    year: '2020',
+    content: 'Matemática',
+    topic: '',
+    quantity: 5,
+  } as QuestionFilterProps)
 
   async function handleGenerateQuestions() {
+    console.log(filter)
     await generateQuestions({
       data: {
         organization: filter.organization,
@@ -56,62 +61,74 @@ export const CardFilter = ({ data }: CardFilterProps) => {
             }}
           >
             <div className={styles.form_group}>
-              <label htmlFor="subject">Matéria</label>
+              <label htmlFor="content">Matéria</label>
               <select
-                name="subject"
-                id="subject"
+                name="content"
+                id="content"
                 onChange={(event) => {
                   setFilter({
                     ...filter,
                     content: event.target.value,
                   })
                 }}
+                value={filter.content}
               >
-                <option value="matematica">Matemática</option>
+                <option value="matematica" selected>
+                  Matemática
+                </option>
                 <option value="portugues">Português</option>
                 <option value="historia">História</option>
                 <option value="geografia">Geografia</option>
                 <option value="fisica">Física</option>
               </select>
-              <label htmlFor="subject">Banca</label>
+              <label htmlFor="organization">Banca</label>
               <select
-                name="subject"
-                id="subject"
+                name="organization"
+                id="organization"
                 onChange={(event) => {
                   setFilter({
                     ...filter,
                     organization: event.target.value,
                   })
                 }}
+                value={filter.organization}
               >
-                <option value="cespe">CESPE</option>
+                <option value="cespe" selected>
+                  CESPE
+                </option>
                 <option value="fgv">FGV</option>
                 <option value="fmp">FMP</option>
                 <option value="fcc">FCC</option>
                 <option value="vunesp">VUNESP</option>
               </select>
-              <label htmlFor="subject">Ano</label>
+              <label htmlFor="year">Ano</label>
               <select
-                name="subject"
-                id="subject"
+                name="year"
+                id="year"
                 onChange={(event) => {
                   setFilter({
                     ...filter,
                     year: event.target.value,
                   })
                 }}
+                value={filter.year}
               >
                 <option value="2021">2021</option>
-                <option value="2020">2020</option>
+                <option value="2020" selected>
+                  2020
+                </option>
               </select>
             </div>
             <div className={styles.form_group}>
-              <label htmlFor="subject">Quantidade de questões</label>
+              <label htmlFor="quantity">Quantidade de questões</label>
               <input
+                name="quantity"
+                id="quantity"
                 type="range"
                 max={10}
-                min={0}
+                min={1}
                 step={1}
+                value={filter.quantity}
                 onChange={(event) => {
                   setFilter({
                     ...filter,

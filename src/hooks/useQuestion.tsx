@@ -42,7 +42,7 @@ export function QuestionProvider({ children }: IQuestionProviderProps) {
   async function generateQuestions({
     data,
   }: QuestionFilterProps): Promise<void> {
-    console.log(data)
+    console.log('aquiiii', data)
     try {
       const response = await fetch(
         'http://localhost:8080/api/question/filter',
@@ -57,7 +57,7 @@ export function QuestionProvider({ children }: IQuestionProviderProps) {
             year: data.year !== '' ? data.year : null,
             content: data.content !== '' ? data.content : null,
             topic: data.topic !== '' ? data.topic : null,
-            quantity: data.quantity < 1 ? data.quantity : null,
+            quantity: data.quantity > 1 ? data.quantity : null,
           }),
           cache: 'no-cache',
         },

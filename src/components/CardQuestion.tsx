@@ -1,4 +1,7 @@
+'use client'
+
 import styles from '@/styles/components/CardQuestion.module.scss'
+import { useState } from 'react'
 
 type CardQuestionProps = {
   data: {
@@ -15,6 +18,20 @@ type CardQuestionProps = {
 }
 
 export const CardQuestion = ({ data }: CardQuestionProps) => {
+  const [correct, setCorrect] = useState('')
+  const [incorrect, setIncorrect] = useState('')
+
+  function handleOptionIsIqualAnswer(option: string) {
+    const check = option === data.answer
+
+    if (check) {
+      setCorrect(option)
+    } else {
+      setIncorrect(option)
+      setCorrect(data.answer)
+    }
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.content}>
@@ -28,7 +45,19 @@ export const CardQuestion = ({ data }: CardQuestionProps) => {
           <p className={styles.question}>{data.question}</p>
           <ul className={styles.list_options}>
             {data.options.map((option, index) => (
-              <li className={styles.option} key={index}>
+              <li
+                className={styles.option}
+                key={index}
+                onClick={() => handleOptionIsIqualAnswer(option)}
+                style={{
+                  backgroundColor:
+                    correct === option
+                      ? '#c7f9cc'
+                      : '' || incorrect === option
+                      ? '#ee6055'
+                      : '',
+                }}
+              >
                 {option}
               </li>
             ))}
