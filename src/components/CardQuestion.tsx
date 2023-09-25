@@ -1,5 +1,6 @@
 'use client'
 
+import { useQuestion } from '@/hooks/useQuestion'
 import styles from '@/styles/components/CardQuestion.module.scss'
 import { useState } from 'react'
 
@@ -20,8 +21,10 @@ type CardQuestionProps = {
 export const CardQuestion = ({ data }: CardQuestionProps) => {
   const [correct, setCorrect] = useState('')
   const [incorrect, setIncorrect] = useState('')
+  const { generateReport } = useQuestion()
 
   function handleOptionIsIqualAnswer(option: string) {
+    generateReport(data, option)
     const check = option === data.answer
 
     if (!check && correct !== '') {

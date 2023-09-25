@@ -16,7 +16,7 @@ export default function Home() {
   const [modal, setModal] = useState(false)
   const [alert, setAlert] = useState(false)
   const [path, setPath] = useState('create')
-  const { questions } = useQuestion()
+  const { questions, showReport } = useQuestion()
 
   function handleShowModal() {
     setModal(!modal)
@@ -146,7 +146,14 @@ export default function Home() {
               )}
             </div>
             <button className={styles.button_body_center}>
-              <p className={styles.text_button_body_center}>Gerar Relatório</p>
+              <p
+                className={styles.text_button_body_center}
+                onClick={() => {
+                  console.log(showReport())
+                }}
+              >
+                Gerar Relatório
+              </p>
             </button>
           </section>
           <section className={styles.body_right}>

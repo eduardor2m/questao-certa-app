@@ -31,9 +31,16 @@ type QuestionFilterProps = {
   }
 }
 
+type IReport = {
+  question: QuestionProps
+  choice: string
+}
+
 interface IQuestionContextData {
   questions: QuestionProps[]
   generateQuestions: ({ data }: QuestionFilterProps) => Promise<void>
+  generateReport: (question: QuestionProps, choice: string) => Promise<void>
+  showReport: () => (IReport | undefined)[]
 }
 
 interface IQuestionProviderProps {
@@ -45,10 +52,12 @@ const QuestionContext = createContext<IQuestionContextData>(
 )
 
 const questionCookieKey = '@questao-certa-app:questions'
+const reportCookieKey = '@questao-certa-app:report'
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || '' // Provide a default value
 
 export function QuestionProvider({ children }: IQuestionProviderProps) {
   const [questions, setQuestions] = useState<QuestionProps[]>([])
+  const [report, setReport] = useState<IReport[]>([])
 
   async function questionsInStorage() {
     const tokenCookie = getCookie(questionCookieKey)
@@ -61,8 +70,20 @@ export function QuestionProvider({ children }: IQuestionProviderProps) {
     }
   }
 
+  async function reportInStorage() {
+    const reportCookie = getCookie(reportCookieKey)
+
+    if (reportCookie) {
+      const token = JSON.parse(reportCookie)?.token
+      setReport(token || [])
+    } else {
+      setReport([])
+    }
+  }
+
   useEffect(() => {
     questionsInStorage()
+    reportInStorage()
   }, [])
 
   function getUserTokenFromCookie(): string | undefined {
@@ -117,11 +138,35 @@ export function QuestionProvider({ children }: IQuestionProviderProps) {
     }
   }
 
+  async function generateReport(question: QuestionProps, choice: string) {
+    try {
+      if (question.answer !== choice) {
+        setReport([...report, { question, choice }])
+        document.cookie = `${reportCookieKey}=${JSON.stringify(
+          report,
+        )}; path=/; max-age=86400`
+      } else {
+        setReport([...report, { question, choice }])
+        document.cookie = `${reportCookieKey}=${JSON.stringify(
+          report,
+        )}; path=/; max-age=86400`
+      }
+    } catch (error) {
+      console.error('Error:', error)
+    }
+  }
+
+  function showReport(): (IReport | undefined)[] {
+    return report
+  }
+
   return (
     <QuestionContext.Provider
       value={{
         questions,
         generateQuestions,
+        generateReport,
+        showReport,
       }}
     >
       {children}
