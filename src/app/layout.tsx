@@ -1,4 +1,5 @@
 import { QuestionProvider } from '@/hooks/useQuestion'
+import { UserProvider } from '@/hooks/useUser'
 import '@/styles/globals.scss'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
@@ -17,10 +18,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <QuestionProvider>
-      <html lang="en">
-        <body className={inter.className}>{children}</body>
-      </html>
-    </QuestionProvider>
+    <UserProvider>
+      <QuestionProvider>
+        <html lang="en">
+          <body className={inter.className}>{children}</body>
+        </html>
+      </QuestionProvider>
+    </UserProvider>
   )
 }

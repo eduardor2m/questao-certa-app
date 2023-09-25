@@ -156,7 +156,7 @@ export default function Home() {
                   className={styles.icon_body_right_informations}
                   size={20}
                 />
-                Informaticvo
+                Informativo
               </h2>
               <p className={styles.body_right_informations_text}>
                 Quando você terminar de criar seu simulado, você pode{' '}

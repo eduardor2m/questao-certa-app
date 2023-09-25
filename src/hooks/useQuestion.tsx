@@ -47,10 +47,13 @@ const QuestionContext = createContext<IQuestionContextData>(
 export function QuestionProvider({ children }: IQuestionProviderProps) {
   const [questions, setQuestions] = useState<QuestionProps[]>([])
 
-  const userCookieKey = '@questao-certa-app:questions'
+  const questionCookieKey = '@questao-certa-app:questions'
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
   async function questionsInStorage() {
-    const getTokenFromCookie = getCookie(userCookieKey)?.valueOf().toString()
+    const getTokenFromCookie = getCookie(questionCookieKey)
+      ?.valueOf()
+      .toString()
 
     if (getTokenFromCookie) {
       const token = JSON.parse(getTokenFromCookie!).token
@@ -69,24 +72,24 @@ export function QuestionProvider({ children }: IQuestionProviderProps) {
     data,
   }: QuestionFilterProps): Promise<void> {
     try {
-      const response = await fetch(
-        'http://localhost:8080/api/question/filter',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-
-          body: JSON.stringify({
-            organization: data.organization !== '' ? data.organization : null,
-            year: data.year !== '' ? data.year : null,
-            content: data.content !== '' ? data.content : null,
-            topic: data.topic !== '' ? data.topic : null,
-            quantity: data.quantity >= 1 ? data.quantity : null,
-          }),
-          cache: 'no-cache',
+      const token = getCookie('@questao-certa-app:user')?.valueOf().toString()
+      console.log(token)
+      const response = await fetch(`${apiUrl}/question/filter`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
-      )
+
+        body: JSON.stringify({
+          organization: data.organization !== '' ? data.organization : null,
+          year: data.year !== '' ? data.year : null,
+          content: data.content !== '' ? data.content : null,
+          topic: data.topic !== '' ? data.topic : null,
+          quantity: data.quantity >= 1 ? data.quantity : null,
+        }),
+        cache: 'no-cache',
+      })
 
       if (response.ok) {
         const data = await response.json()
@@ -96,7 +99,7 @@ export function QuestionProvider({ children }: IQuestionProviderProps) {
           token: data,
         }
 
-        document.cookie = `${userCookieKey}=${JSON.stringify(
+        document.cookie = `${questionCookieKey}=${JSON.stringify(
           setTokenInCookie,
         )}; path=/; max-age=86400`
 
