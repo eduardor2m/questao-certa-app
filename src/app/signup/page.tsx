@@ -7,11 +7,8 @@ import React from 'react'
 
 type IUser = {
   name: string
-  cpf: string
-  phone: string
   email: string
   password: string
-  dateOfBirth: string
 }
 
 export default function SignUp() {
@@ -22,20 +19,14 @@ export default function SignUp() {
     e.preventDefault()
 
     const target = e.target as HTMLFormElement
-    const cpf = target.cpf.value
     const name = target.fullName.value
-    const phone = target.phone.value
     const email = target.email.value
     const password = target.password.value
-    const dateOfBirth = target.dateOfBirth.value
 
     const newUser: IUser = {
       name,
-      cpf,
-      phone,
       email,
       password,
-      dateOfBirth,
     }
 
     console.log(newUser)
@@ -62,30 +53,9 @@ export default function SignUp() {
         />
         <input
           className={styles.input}
-          type="text"
-          placeholder="CPF"
-          name="cpf"
-          required
-        />
-        <input
-          className={styles.input}
-          type="text"
-          placeholder="Telefone"
-          name="phone"
-          required
-        />
-        <input
-          className={styles.input}
           type="email"
           placeholder="Email"
           name="email"
-          required
-        />
-        <input
-          className={styles.input}
-          type="text"
-          placeholder="Data de nascimento"
-          name="dateOfBirth"
           required
         />
         <input

@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable no-inner-declarations */
 'use client'
+
 import {
   createContext,
   ReactNode,
@@ -11,7 +9,6 @@ import {
 } from 'react'
 
 import { getCookie, setCookie, deleteCookie } from 'cookies-next'
-
 import { useRouter } from 'next/navigation'
 
 type IUser = {
@@ -21,16 +18,13 @@ type IUser = {
 type IUserProps = {
   data: {
     name: string
-    cpf: string
-    phone: string
     email: string
     password: string
-    dateOfBirth: string
   }
 }
 
 interface IUserContextData {
-  user: IUser
+  user: IUser | null
   signup: ({ data }: IUserProps) => Promise<void>
   signin: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
@@ -44,62 +38,48 @@ const UserContext = createContext<IUserContextData>({} as IUserContextData)
 
 export function UserProvider({ children }: IUserProviderProps) {
   const route = useRouter()
-  const [user, setUser] = useState<IUser>({} as IUser)
+  const [user, setUser] = useState<IUser | null>(null)
   const userCookieKey = '@questao-certa-app:user'
   const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
-  console.log(apiUrl)
-
-  async function userInStorage() {
+  useEffect(() => {
     const getTokenFromCookie = getCookie(userCookieKey)?.valueOf().toString()
 
     if (getTokenFromCookie) {
-      const token = JSON.parse(getTokenFromCookie!).token
-
-      setUser(token)
-    } else {
-      setUser({} as IUser)
+      const token = JSON.parse(getTokenFromCookie).token
+      setUser({ token })
     }
-  }
-
-  useEffect(() => {
-    userInStorage()
   }, [])
 
   async function signup({ data }: IUserProps): Promise<void> {
-    console.log(data)
     try {
       const response = await fetch(`${apiUrl}/user`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-
         body: JSON.stringify({
           name: data.name,
-          cpf: data.cpf,
-          phone: data.phone,
           email: data.email,
           password: data.password,
-          date_of_birth: data.dateOfBirth,
         }),
         cache: 'no-cache',
       })
 
       if (response.ok) {
-        const data = await response.json()
-        console.log(data)
+        const responseData = await response.json()
+        console.log(responseData)
       } else {
-        console.log('Error:', response.status)
+        throw new Error(`Error: ${response.status}`)
       }
     } catch (error) {
-      console.log('Error:', error)
+      throw new Error(`Error: ${error}`)
     }
   }
 
   async function signin(email: string, password: string): Promise<void> {
     try {
-      const response = await fetch(`${apiUrl}/user/signin`, {
+      const { headers, ok, status } = await fetch(`${apiUrl}/user/signin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,27 +88,27 @@ export function UserProvider({ children }: IUserProviderProps) {
         cache: 'no-cache',
       })
 
-      if (response.ok) {
-        const data = await response.json()
-        setUser(data.token)
-        setCookie(userCookieKey, JSON.stringify(data))
-        console.log(data)
+      if (ok) {
+        const token = headers.get('Authorization')
+        if (token) {
+          setCookie(userCookieKey, JSON.stringify(token))
+          setUser({ token })
+        }
       } else {
-        console.log('Error:', response.status)
+        throw new Error(`Error: ${status}`)
       }
     } catch (error) {
-      console.log('Error:', error)
+      throw new Error(`Error: ${error}`)
     }
   }
 
   async function logout() {
     try {
-      setUser({} as IUser)
+      setUser(null)
       deleteCookie(userCookieKey)
-
       route.push('/')
-    } catch {
-      throw new Error('Erro ao sair')
+    } catch (error) {
+      throw new Error(`Error: ${error}`)
     }
   }
 
@@ -148,6 +128,5 @@ export function UserProvider({ children }: IUserProviderProps) {
 
 export function useUser(): IUserContextData {
   const context = useContext(UserContext)
-
   return context
 }

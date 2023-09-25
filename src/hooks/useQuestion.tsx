@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 'use client'
-import { getCookie } from 'cookies-next'
 import {
   createContext,
   ReactNode,
@@ -8,6 +7,7 @@ import {
   useEffect,
   useState,
 } from 'react'
+import { getCookie } from 'cookies-next'
 
 type QuestionProps = {
   id: string
@@ -44,21 +44,18 @@ const QuestionContext = createContext<IQuestionContextData>(
   {} as IQuestionContextData,
 )
 
+const questionCookieKey = '@questao-certa-app:questions'
+const apiUrl = process.env.NEXT_PUBLIC_API_URL || '' // Provide a default value
+
 export function QuestionProvider({ children }: IQuestionProviderProps) {
   const [questions, setQuestions] = useState<QuestionProps[]>([])
 
-  const questionCookieKey = '@questao-certa-app:questions'
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL
-
   async function questionsInStorage() {
-    const getTokenFromCookie = getCookie(questionCookieKey)
-      ?.valueOf()
-      .toString()
+    const tokenCookie = getCookie(questionCookieKey)
 
-    if (getTokenFromCookie) {
-      const token = JSON.parse(getTokenFromCookie!).token
-
-      setQuestions(token)
+    if (tokenCookie) {
+      const token = JSON.parse(tokenCookie)?.token
+      setQuestions(token || [])
     } else {
       setQuestions([])
     }
@@ -68,24 +65,34 @@ export function QuestionProvider({ children }: IQuestionProviderProps) {
     questionsInStorage()
   }, [])
 
+  function getUserTokenFromCookie(): string | undefined {
+    const token = getCookie('@questao-certa-app:user')?.valueOf().toString()
+    const tokenWithoutQuotes = token?.replace(/['"]+/g, '')
+
+    return tokenWithoutQuotes
+  }
+
   async function generateQuestions({
     data,
   }: QuestionFilterProps): Promise<void> {
     try {
-      const token = getCookie('@questao-certa-app:user')?.valueOf().toString()
-      console.log(token)
+      const token = getUserTokenFromCookie()
+
+      if (!token) {
+        return
+      }
+
       const response = await fetch(`${apiUrl}/question/filter`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-
         body: JSON.stringify({
-          organization: data.organization !== '' ? data.organization : null,
-          year: data.year !== '' ? data.year : null,
-          content: data.content !== '' ? data.content : null,
-          topic: data.topic !== '' ? data.topic : null,
+          organization: data.organization || null,
+          year: data.year || null,
+          content: data.content || null,
+          topic: data.topic || null,
           quantity: data.quantity >= 1 ? data.quantity : null,
         }),
         cache: 'no-cache',
@@ -95,9 +102,7 @@ export function QuestionProvider({ children }: IQuestionProviderProps) {
         const data = await response.json()
         setQuestions(data)
 
-        const setTokenInCookie = {
-          token: data,
-        }
+        const setTokenInCookie = { token: data }
 
         document.cookie = `${questionCookieKey}=${JSON.stringify(
           setTokenInCookie,
@@ -108,7 +113,7 @@ export function QuestionProvider({ children }: IQuestionProviderProps) {
         console.log('Error:', response.status)
       }
     } catch (error) {
-      console.log('Error:', error)
+      console.error('Error:', error)
     }
   }
 
@@ -126,6 +131,5 @@ export function QuestionProvider({ children }: IQuestionProviderProps) {
 
 export function useQuestion(): IQuestionContextData {
   const context = useContext(QuestionContext)
-
   return context
 }
